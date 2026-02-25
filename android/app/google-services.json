@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "710647556468",
+    "project_id": "roadeye-hackathon",
+    "storage_bucket": "roadeye-hackathon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:710647556468:android:4473faee8a8eb02d096421",
+        "android_client_info": {
+          "package_name": "com.example.roadeye_dashboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDi4wUw1qUFTDZHbAcydDYx8sCoKVbQkqk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
