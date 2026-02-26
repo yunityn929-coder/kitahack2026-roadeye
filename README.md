@@ -23,7 +23,7 @@ RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens 
 
 ### 📋 Active Potholes List
 
-![Active Potholes List](screenshots\active_pothole_history.png)
+![Active Potholes List](screenshots/active_pothole_history.png)
 
 - Paginated list of all unresolved hazards
 - Sortable by confidence score and severity
