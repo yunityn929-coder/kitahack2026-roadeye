@@ -1,7 +1,7 @@
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roadeye_dashboard/pothole_list_page.dart';
+import 'package:roadeye_dashboard/history_page.dart';
 import 'dart:js' as js;
 import 'package:roadeye_dashboard/sidebar.dart';
 
@@ -14,8 +14,8 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
-  bool _isSidebarCollapsed = false;
   final Set<String> _drawnMarkerIds = {};
+
 
   @override
   void initState() {
@@ -24,6 +24,14 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _initGoogleMap() {
+    // Expose a Dart function that JS can call to update Firestore
+    js.context['dartResolveMarker'] = js.allowInterop((String markerId) {
+      FirebaseFirestore.instance
+          .collection('hazards_raw')
+          .doc(markerId)
+          .update({'status': 'RESOLVED'});
+    });
+
     js.context.callMethod('eval', [
       """
       (function() {
@@ -31,6 +39,10 @@ class _DashboardPageState extends State<DashboardPage> {
         window.currentInfoWindow = null;
 
         window.resolveMarker = function(markerId) {
+          // Update Firestore via Dart callback
+          if (window.dartResolveMarker) {
+            window.dartResolveMarker(markerId);
+          }
           if (window.markerRegistry[markerId]) {
             window.markerRegistry[markerId].setMap(null);
             delete window.markerRegistry[markerId];
@@ -49,91 +61,82 @@ class _DashboardPageState extends State<DashboardPage> {
               zoom: 13,
               disableDefaultUI: false
             });
-
-            window.map.addListener('click', function() {
-              if (window.currentInfoWindow) {
-                window.currentInfoWindow.close();
-                window.currentInfoWindow = null;
-              }
-            });
           } else {
             setTimeout(tryInitMap, 200);
           }
         }
-
         tryInitMap();
       })();
       """
     ]);
-
     _listenToRawHazards();
   }
 
   void _listenToRawHazards() {
     FirebaseFirestore.instance
         .collection('hazards_raw')
-        .where('status', isEqualTo: 'PENDING')
         .snapshots()
         .listen((snapshot) {
       for (var doc in snapshot.docs) {
         if (_drawnMarkerIds.contains(doc.id)) continue;
-
+        
         final data = doc.data();
-        final lat = (data['lat']).toDouble();
-        final lng = (data['lng']).toDouble();
-        final confidence = (data['confidence']).toDouble();
-
-        // Determine severity based on confidence
-        final severity = confidence >= 0.8
-            ? 'HIGH'
-            : confidence >= 0.5
-                ? 'MEDIUM'
-                : 'LOW';
+        final confidence = (data['confidence'] ?? 0).toDouble();
+        final status = data['status'] ?? 'PENDING';
+        
+        final severity = confidence >= 0.8 ? 'HIGH' : confidence >= 0.5 ? 'MEDIUM' : 'LOW';
 
         _addMarkerToJs(
-          doc.id,
-          lat,
-          lng,
-          data['imageUrl'] ?? '',
-          data['detectedBy'] ?? 'HAZARD',
+          doc.id, 
+          (data['lat']).toDouble(), 
+          (data['lng']).toDouble(), 
+          data['imageUrl'] ?? '', 
+          data['detectedBy'] ?? 'HAZARD', 
           severity,
-          confidence,
-          "Confidence: ${(confidence * 100).toStringAsFixed(1)}%",
+          status
         );
-
         _drawnMarkerIds.add(doc.id);
       }
     });
   }
 
-  void _addMarkerToJs(String id, double lat, double lng, String img,
-      String label, String sev, double confidence, String des) {
-    // final iconColor = sev.toUpperCase() == 'HIGH'
-    //     ? 'red'
-    //     : sev.toUpperCase() == 'MEDIUM'
-    //         ? 'orange'
-    //         : 'yellow';
+  void _addMarkerToJs(String id, double lat, double lng, String img, String label, String sev, String status) {
+    // Severity / status colours
+    String accentColor   = '#f59e0b'; // default LOW  → amber
+    String badgeBg       = '#78350f';
+    String markerColor   = '%23f59e0b';  // URL-encoded for SVG fill (LOW)
 
-    // final headerColor = sev.toUpperCase() == 'HIGH'
-    //     ? '#c62828'
-    //     : sev.toUpperCase() == 'MEDIUM'
-    //         ? '#e65100'
-    //         : '#f9a825';
-    String iconColor;
-    String headerColor;
-    if (sev == "HIGH") {
-      iconColor = 'red';
-      headerColor = '#c62828';
+    if (status == "RESOLVED") {
+      accentColor  = '#22c55e';
+      badgeBg      = '#14532d';
+      markerColor  = '%2322c55e';
+    } else if (sev == "HIGH") {
+      accentColor  = '#ef4444';
+      badgeBg      = '#7f1d1d';
+      markerColor  = '%23ef4444';
     } else if (sev == "MEDIUM") {
-      iconColor = 'orange';
-      headerColor = '#e65100';
-    } else {
-      iconColor = 'yellow';
-      headerColor = '#f9a825';
+      accentColor  = '#f97316';
+      badgeBg      = '#7c2d12';
+      markerColor  = '%23f97316';
     }
 
-    final latStr = lat.toStringAsFixed(4);
-    final lngStr = lng.toStringAsFixed(4);
+    String sevIcon = sev == "HIGH" ? "⚠" : sev == "MEDIUM" ? "▲" : "●";
+    if (status == "RESOLVED") sevIcon = "✓";
+
+    String actionHtml = status == "RESOLVED"
+        ? '''<div style="display:flex;align-items:center;gap:6px;justify-content:center;padding:8px 0 2px;">
+               <span style="font-size:16px;">✓</span>
+               <span style="color:#22c55e;font-weight:700;font-size:13px;letter-spacing:.5px;">REPAIRED</span>
+             </div>'''
+        : '''<button onclick="window.resolveMarker('$id')"
+               style="width:100%;padding:9px 0;background:linear-gradient(135deg,$accentColor,${accentColor}cc);
+                      color:#fff;border:none;border-radius:6px;cursor:pointer;
+                      font-size:12px;font-weight:700;letter-spacing:.8px;
+                      box-shadow:0 2px 8px ${accentColor}55;transition:opacity .2s;"
+               onmouseover="this.style.opacity='.85'"
+               onmouseout="this.style.opacity='1'">
+             MARK AS REPAIRED
+           </button>''';
 
     js.context.callMethod('eval', [
       """
@@ -144,46 +147,90 @@ class _DashboardPageState extends State<DashboardPage> {
             return;
           }
 
+          // Custom SVG pin marker
+          var svgMarker = {
+            url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46"><defs><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.35"/></filter></defs><path d="M18 2C9.163 2 2 9.163 2 18c0 11.25 16 26 16 26S34 29.25 34 18C34 9.163 26.837 2 18 2z" fill="$markerColor" filter="url(%23s)"/><circle cx="18" cy="18" r="7" fill="white" opacity="0.9"/></svg>',
+            scaledSize: new google.maps.Size(36, 46),
+            anchor: new google.maps.Point(18, 46),
+          };
+
           var marker = new google.maps.Marker({
             position: { lat: $lat, lng: $lng },
             map: window.map,
-            title: '$label',
-            icon: {
-              url: 'http://maps.google.com/mapfiles/ms/icons/$iconColor-dot.png',
-              scaledSize: new google.maps.Size(40, 40)
-            },
+            icon: svgMarker,
             animation: google.maps.Animation.DROP
           });
 
           window.markerRegistry['$id'] = marker;
 
+          var contentString = `
+            <div style="
+              width: 240px;
+              font-family: 'Segoe UI', system-ui, sans-serif;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 8px 32px rgba(0,0,0,.28);
+              border: 1px solid rgba(255,255,255,.08);
+            ">
+              <!-- Image with gradient overlay -->
+              <div style="position:relative; height:130px; background:#111;">
+                <img src="$img"
+                  style="width:100%;height:100%;object-fit:cover;display:block;opacity:.92;"
+                  onerror="this.src='https://placehold.co/240x130/1a1a1a/555?text=No+Image'">
+                <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%);"></div>
+
+                <!-- Severity badge -->
+                <div style="
+                  position:absolute;top:10px;left:10px;
+                  background:$badgeBg;
+                  border:1.5px solid $accentColor;
+                  color:$accentColor;
+                  padding:3px 9px;
+                  border-radius:20px;
+                  font-size:10px;font-weight:700;letter-spacing:1px;
+                ">$sevIcon $sev</div>
+
+                <!-- Label at bottom of image -->
+                <div style="position:absolute;bottom:10px;left:12px;right:12px;">
+                  <div style="color:#fff;font-size:14px;font-weight:700;letter-spacing:.3px;text-shadow:0 1px 4px rgba(0,0,0,.6);">
+                    $label
+                  </div>
+                </div>
+              </div>
+
+              <!-- Body -->
+              <div style="padding:14px;background:#1c1c1e;">
+                <!-- Coords row -->
+                <div style="display:flex;gap:6px;margin-bottom:12px;">
+                  <div style="flex:1;background:#2a2a2d;border-radius:6px;padding:6px 8px;">
+                    <div style="color:#888;font-size:9px;letter-spacing:.8px;margin-bottom:2px;">LAT</div>
+                    <div style="color:#e5e5e5;font-size:11px;font-weight:600;">${lat.toStringAsFixed(5)}</div>
+                  </div>
+                  <div style="flex:1;background:#2a2a2d;border-radius:6px;padding:6px 8px;">
+                    <div style="color:#888;font-size:9px;letter-spacing:.8px;margin-bottom:2px;">LNG</div>
+                    <div style="color:#e5e5e5;font-size:11px;font-weight:600;">${lng.toStringAsFixed(5)}</div>
+                  </div>
+                </div>
+
+                <!-- Accent divider -->
+                <div style="height:2px;background:linear-gradient(90deg,$accentColor,transparent);border-radius:2px;margin-bottom:12px;"></div>
+
+                $actionHtml
+              </div>
+            </div>
+          `;
+
           var popup = new google.maps.InfoWindow({
-            content:
-              '<div style="width:220px;font-family:Segoe UI,sans-serif;border-radius:8px;overflow:hidden;">' +
-                '<div style="background:$headerColor;color:white;padding:8px 12px;font-weight:bold;font-size:14px;">' +
-                  '🚨 $label <span style="float:right;background:rgba(255,255,255,0.25);border-radius:4px;padding:2px 6px;font-size:11px;">$sev</span>' +
-                '</div>' +
-                '<div style="height:120px;overflow:hidden;">' +
-                  '<img src="$img" style="width:100%;height:100%;object-fit:cover;" onerror="this.src=\\'https://placehold.co/220x120?text=No+Image\\'"/>' +
-                '</div>' +
-                '<div style="padding:10px 12px;background:white;color:#333;">' +
-                  '<div style="font-size:12px;color:#666;margin-bottom:4px;">📍 $latStr, $lngStr</div>' +
-                  '<button onclick="window.resolveMarker(\\'$id\\')" style="width:100%;background:#2e7d32;color:white;border:none;padding:8px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:bold;">✅ Mark as Repaired</button>' +
-                '</div>' +
-              '</div>',
-            maxWidth: 240
+            content: contentString,
+            disableAutoPan: false
           });
 
-          marker.addListener('click', function() {
-            if (window.currentInfoWindow) {
-              window.currentInfoWindow.close();
-            }
+          marker.addListener('click', () => {
+            if (window.currentInfoWindow) window.currentInfoWindow.close();
             popup.open(window.map, marker);
             window.currentInfoWindow = popup;
-            window.map.panTo(marker.getPosition());
           });
         }
-
         tryAddMarker();
       })();
       """
@@ -195,36 +242,19 @@ class _DashboardPageState extends State<DashboardPage> {
     return Scaffold(
       body: Row(
         children: [
-          // ── SIDEBAR ──
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: _isSidebarCollapsed ? 60 : 250,
-            color: Colors.grey[850],
-            child: _isSidebarCollapsed
-                ? Column(
-                    children: [
-                      IconButton(
-                        icon:
-                            const Icon(Icons.arrow_right, color: Colors.white),
-                        onPressed: () =>
-                            setState(() => _isSidebarCollapsed = false),
-                      ),
-                    ],
-                  )
-                : SimpleSidebar(
-                    selectedIndex: _selectedIndex,
-                    onItemSelected: (index) =>
-                        setState(() => _selectedIndex = index),
-                  ),
-          ),
+          SimpleSidebar(
+            selectedIndex: _selectedIndex,
+            onItemSelected: (index) => setState(() => _selectedIndex = index),
 
-          // ── MAIN CONTENT ──
+          ),
           Expanded(
             child: IndexedStack(
               index: _selectedIndex,
-              children: const [
-                HtmlElementView(viewType: 'map-canvas'),
-                PotholeListPage(),
+              children: [
+                const HtmlElementView(viewType: 'map-canvas'),
+                const PotholeListPage(),
+                const HistoryPage(),
+                const Center(child: Text("Audit Logs Page")),
               ],
             ),
           ),
