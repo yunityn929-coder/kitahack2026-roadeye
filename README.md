@@ -1,36 +1,44 @@
-# RoadEye OS — Hazard Intelligence Dashboard
+# 🚧 RoadEye OS — Hazard Intelligence Dashboard
 
 > A real-time road hazard monitoring dashboard built with Flutter Web, Firebase, and Google Maps. Designed for road authorities and field operations teams to track, manage, and resolve potholes and road hazards.
 
 ---
 
-## Overview
+## 📸 Overview
+
+![Dashboard Overview](screenshots/dashboard.png)
 
 RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens to a live Firestore stream, plots detected hazards on an interactive map the moment they arrive, and gives admins the tools to manage, resolve, and report on road hazards — all in real time.
 
 ---
 
-## Features
+## ✨ Features
 
-### Live Hazard Map
+### 🗺️ Live Hazard Map
 
 - Real-time Google Maps integration with custom SVG pin markers
 - Markers colour-coded by severity — **HIGH** (red), **MEDIUM** (orange), **LOW** (amber), **RESOLVED** (green)
 - Click any marker to view a popup with image, coordinates, severity badge, and a **Mark as Repaired** button
 - Severity filter bar — toggle HIGH / MEDIUM / LOW / RESOLVED markers on/off with live counts
 
-### Active Potholes List
+### 📋 Active Potholes List
+
+![Active Potholes List](screenshots\active_pothole_history.png)
 
 - Paginated list of all unresolved hazards
 - Sortable by confidence score and severity
 - One-click resolve from the list view
 
-### History
+### 🕓 Repaired History
+
+![Repaired History](screenshots/repaired_history.png)
 
 - Full log of all resolved hazards with animated cards
 - Shows original severity, confidence score, coordinates, and detection image
 
-### Analytics Dashboard
+### 📊 Analytics Dashboard
+
+![Analytics Dashboard](screenshots/analytics.png)
 
 - Live KPI cards — Total Hazards, Active, Resolved, Resolution Rate
 - Donut chart — Status breakdown (Resolved vs Active)
@@ -38,17 +46,23 @@ RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens 
 - Circular resolution progress ring
 - Severity × Status matrix cross-tab table
 
-### CSV Export
+### 📥 CSV Export
 
 - One-click download of the full hazards dataset
 - Includes ID, detected by, coordinates, confidence %, severity, and status
 
-### Profile & Account
+### 👤 Profile & Account
+
+![Profile & Reset Password](screenshots/reset_password.png)
 
 - Profile modal showing logged-in admin email and role badge
 - Password reset via Firebase Auth email link — sent directly from the dashboard
 
-### Authentication
+### 🔐 Authentication
+
+| Login                              | Register                                 |
+| ---------------------------------- | ---------------------------------------- |
+| ![Login Page](screenshots/login.png) | ![Register Page](screenshots/register.png) |
 
 - Firebase Auth email/password login and signup
 - Admin-only account creation
@@ -56,7 +70,7 @@ RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens 
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Layer    | Technology                      |
 | -------- | ------------------------------- |
@@ -69,7 +83,7 @@ RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens 
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 lib/
@@ -85,7 +99,7 @@ lib/
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -144,7 +158,7 @@ flutter run -d chrome
 
 ---
 
-## Firestore Data Structure
+## 🗄️ Firestore Data Structure
 
 The dashboard reads from a single collection: `hazards_raw`
 
@@ -181,20 +195,5 @@ The dashboard reads from a single collection: `hazards_raw`
   "timestamp": 1706000000000
 }
 ```
-
----
-
-## Roadmap
-
-- [ ] Heatmap density layer
-- [ ] Bulk resolve / bulk export
-- [ ] Assign hazards to road crew
-- [ ] Admin activity audit log
-- [ ] Draw zone polygon filter
-- [ ] New hazard push notifications
-- [ ] CSV report export
-- [ ] Confidence threshold slider
-- [ ] Dark / light theme toggle
-- [ ] Bahasa Malaysia localisation
 
 ---
