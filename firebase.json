@@ -1,1 +1,39 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"roadeye-hackathon","appId":"1:710647556468:android:4473faee8a8eb02d096421","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"roadeye-hackathon","configurations":{"android":"1:710647556468:android:4473faee8a8eb02d096421","ios":"1:710647556468:ios:eb2e29d2ecbf1aa2096421","macos":"1:710647556468:ios:eb2e29d2ecbf1aa2096421","web":"1:710647556468:web:1549cc78af8603e2096421","windows":"1:710647556468:web:c077564cdc00d740096421"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "roadeye-hackathon",
+          "appId": "1:710647556468:android:4473faee8a8eb02d096421",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "roadeye-hackathon",
+          "configurations": {
+            "android": "1:710647556468:android:4473faee8a8eb02d096421",
+            "ios": "1:710647556468:ios:eb2e29d2ecbf1aa2096421",
+            "macos": "1:710647556468:ios:eb2e29d2ecbf1aa2096421",
+            "web": "1:710647556468:web:1549cc78af8603e2096421",
+            "windows": "1:710647556468:web:c077564cdc00d740096421"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
