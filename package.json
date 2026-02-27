@@ -1,0 +1,23 @@
+{
+  "name": "roadeye-functions",
+  "version": "1.0.0",
+  "description": "RoadEye Verification Pipeline — Gemini 1.5 Flash + Firestore",
+  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "serve": "firebase emulators:start --only functions,firestore",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
+    "axios": "^1.6.0",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  }
+}
