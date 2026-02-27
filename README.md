@@ -1,6 +1,6 @@
 # 🚧 RoadEye OS — Hazard Intelligence Dashboard
 
-> A real-time road hazard monitoring dashboard built with Flutter Web, Firebase, and Google Maps. Designed for road authorities and field operations teams to track, manage, and resolve potholes and road hazards.
+> A real-time road hazard monitoring platform built with Flutter Web, Firebase, and Google Maps. Powered by Gemini 1.5 Flash AI for automated pothole detection and verification.
 
 ---
 
@@ -9,6 +9,8 @@
 ![Dashboard Overview](screenshots/dashboard.png)
 
 RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens to a live Firestore stream, plots detected hazards on an interactive map the moment they arrive, and gives admins the tools to manage, resolve, and report on road hazards — all in real time.
+
+A mobile scanning app captures road photos on the go. Each photo is automatically verified by **Gemini 1.5 Flash** via a Cloud Functions pipeline, which scores confidence, determines severity, and writes the result directly to Firestore — where the dashboard picks it up instantly.
 
 ---
 
@@ -70,32 +72,19 @@ RoadEye OS is the web-based admin dashboard of the RoadEye platform. It listens 
 
 ---
 
+
 ## 🛠️ Tech Stack
 
-| Layer    | Technology                      |
-| -------- | ------------------------------- |
-| Frontend | Flutter Web                     |
-| Database | Cloud Firestore                 |
-| Auth     | Firebase Authentication         |
-| Storage  | Firebase Storage                |
-| Maps     | Google Maps JavaScript API      |
-| Hosting  | Firebase Hosting*(recommended)* |
-
----
-
-## 📁 Project Structure
-
-```
-lib/
-├── main.dart               # App entry, Firebase init, map canvas registration
-├── login_page.dart         # Animated login screen
-├── signup_page.dart        # Admin account creation screen
-├── dashboard_page.dart     # Root layout — sidebar + indexed page stack
-├── sidebar.dart            # Navigation, profile, CSV export, logout
-├── pothole_list_page.dart  # Active hazards list view
-├── history_page.dart       # Resolved hazards history
-└── analytics_page.dart     # Charts and KPI analytics
-```
+| Layer        | Technology                            |
+| ------------ | ------------------------------------- |
+| Frontend     | Flutter Web                           |
+| Database     | Cloud Firestore                       |
+| Auth         | Firebase Authentication               |
+| Storage      | Firebase Storage                      |
+| Maps         | Google Maps JavaScript API            |
+| AI Detection | Gemini 1.5 Flash (Vertex AI)          |
+| Backend      | Firebase Cloud Functions (Node.js 20) |
+| Hosting      | Firebase Hosting*(recommended)*       |
 
 ---
 
@@ -104,11 +93,16 @@ lib/
 ### Prerequisites
 
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) `>=3.0.0`
+- [Node.js](https://nodejs.org/) `>=20`
 - A [Firebase project](https://console.firebase.google.com/) with the following enabled:
   - Authentication (Email/Password)
   - Cloud Firestore
   - Firebase Storage
-- A [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) with the **Maps JavaScript API** enabled
+  - Cloud Functions
+- A [Google Maps API key](https://developers.google.com/maps/documentation/javascript/get-api-key) with **Maps JavaScript API** enabled
+- Vertex AI API enabled in Google Cloud
+
+---
 
 ### 1. Clone the repository
 
@@ -117,15 +111,15 @@ git clone https://github.com/your-username/roadeye-dashboard.git
 cd roadeye-dashboard
 ```
 
-### 2. Install dependencies
+### 2. Install Flutter dependencies
 
 ```bash
 flutter pub get
 ```
 
-### 3. Configure Firebase
+### 3. Configure Firebase (Dashboard)
 
-Replace the placeholder values in `lib/firebase_options.dart` and `lib/main.dart` with your own Firebase project credentials:
+Replace the placeholder values in `lib/firebase_options.dart` and `lib/main.dart`:
 
 ```dart
 await Firebase.initializeApp(
@@ -142,15 +136,29 @@ await Firebase.initializeApp(
 
 ### 4. Add your Google Maps API key
 
-In `web/index.html`, add the Maps JavaScript API script tag inside `<head>`:
+In `web/index.html`, add inside `<head>`:
 
 ```html
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY">
-</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 ```
 
-### 5. Run the app
+### 5. Enable Vertex AI
+
+```bash
+gcloud services enable aiplatform.googleapis.com --project=YOUR_PROJECT_ID
+```
+
+Then in **Google Cloud Console → IAM**, find your service account (`YOUR_PROJECT@appspot.gserviceaccount.com`) and add the **Vertex AI User** role.
+
+### 6. Deploy Cloud Functions
+
+```bash
+cd functions
+npm install
+npm run deploy
+```
+
+### 7. Run the dashboard
 
 ```bash
 flutter run -d chrome
@@ -164,15 +172,21 @@ The dashboard reads from a single collection: `hazards_raw`
 
 ### Document schema
 
-| Field          | Type       | Description                                 |
-| -------------- | ---------- | ------------------------------------------- |
-| `lat`        | `number` | Latitude of detected hazard                 |
-| `lng`        | `number` | Longitude of detected hazard                |
-| `confidence` | `number` | AI confidence score `0.0 – 1.0`          |
-| `imageUrl`   | `string` | Firebase Storage URL of the detection image |
-| `detectedBy` | `string` | Label or type of hazard detected            |
-| `status`     | `string` | `PENDING` or `RESOLVED`                 |
-| `timestamp`  | `number` | Unix timestamp (ms) of detection            |
+| Field            | Type          | Description                                                              |
+| ---------------- | ------------- | ------------------------------------------------------------------------ |
+| `lat`          | `number`    | Latitude of detected hazard                                              |
+| `lng`          | `number`    | Longitude of detected hazard                                             |
+| `confidence`   | `number`    | Gemini AI confidence score `0.0 – 1.0`                                |
+| `imageUrl`     | `string`    | Firebase Storage URL of the detection image                              |
+| `detectedBy`   | `string`    | Device/vehicle ID that submitted the hazard                              |
+| `status`       | `string`    | `PENDING` · `ACTIVE` · `RESOLVED` · `ERROR` · `UNVERIFIED` |
+| `severity`     | `string`    | `LOW` · `MEDIUM` · `HIGH` (set by Gemini)                        |
+| `isPothole`    | `bool`      | Gemini's binary classification result                                    |
+| `description`  | `string`    | Gemini's one-sentence description of the hazard                          |
+| `createdAt`    | `timestamp` | When the hazard was submitted                                            |
+| `verifiedAt`   | `timestamp` | When Gemini completed verification                                       |
+| `geminiRaw`    | `string`    | Raw Gemini JSON response (for debugging)                                 |
+| `errorMessage` | `string?`   | Populated if `status = ERROR`                                          |
 
 ### Severity mapping
 
@@ -188,11 +202,16 @@ The dashboard reads from a single collection: `hazards_raw`
 {
   "lat": 3.139,
   "lng": 101.6869,
-  "confidence": 0.82,
+  "confidence": 0.87,
   "imageUrl": "https://firebasestorage.googleapis.com/...",
-  "detectedBy": "POTHOLE",
-  "status": "PENDING",
-  "timestamp": 1706000000000
+  "detectedBy": "VEHICLE_001",
+  "status": "ACTIVE",
+  "severity": "HIGH",
+  "isPothole": true,
+  "description": "Large pothole covering most of the left lane, approximately 40cm wide.",
+  "createdAt": "2024-01-23T10:30:00Z",
+  "verifiedAt": "2024-01-23T10:30:04Z",
+  "geminiRaw": "{\"isPothole\":true,\"confidence\":0.87,\"severity\":\"HIGH\",\"description\":\"...\"}"
 }
 ```
 
