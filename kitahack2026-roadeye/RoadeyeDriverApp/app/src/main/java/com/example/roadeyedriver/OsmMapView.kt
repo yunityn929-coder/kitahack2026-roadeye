@@ -20,6 +20,24 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
+// New imports to add at the top of file
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.osmdroid.views.CustomZoomButtonsController
+
 @Composable
 fun OsmMapView(modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -32,7 +50,8 @@ fun OsmMapView(modifier: Modifier = Modifier) {
         MapView(context).apply {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
-            controller.setZoom(18.0)
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER) // Hide default zoom buttons
+            controller.setZoom(20.0) // Change back to 20 to avoid excessive zooming when location found
             controller.setCenter(GeoPoint(3.1390, 101.6869)) // Default
             
             // Setup User Location Tracking Overlay
@@ -40,12 +59,19 @@ fun OsmMapView(modifier: Modifier = Modifier) {
             locationOverlay.enableMyLocation()
             locationOverlay.enableFollowLocation()
 
-            // Convert Vector car to Bitmap for OSM
-            val drawable = ContextCompat.getDrawable(context, R.drawable.ic_car)
+            locationOverlay.runOnFirstFix {
+                post {
+                    controller.animateTo(locationOverlay.myLocation)
+                    controller.setZoom(20.0)
+                }
+            }
+
+            // Convert Vector navigation arrow to Bitmap for OSM
+            val drawable = ContextCompat.getDrawable(context, R.drawable.ic_nav_arrow)
             if (drawable != null) {
                 val bitmap = Bitmap.createBitmap(
-                    drawable.intrinsicWidth * 3, // Make it large enough to see clearly
-                    drawable.intrinsicHeight * 3,
+                    drawable.intrinsicWidth, // Kept normal size to be smaller like Waze
+                    drawable.intrinsicHeight,
                     Bitmap.Config.ARGB_8888
                 )
                 val canvas = Canvas(bitmap)
@@ -75,9 +101,36 @@ fun OsmMapView(modifier: Modifier = Modifier) {
         }
     }
 
-    AndroidView(
-        factory = { mapView },
-        modifier = modifier
-    )
+    Box(modifier = modifier) {
+        AndroidView(
+            factory = { mapView },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Custom Zoom Controls on Top Right
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            SmallFloatingActionButton(
+                onClick = { mapView.controller.zoomIn() },
+                modifier = Modifier.size(40.dp),
+                containerColor = Color.White,
+                shape = CircleShape
+            ) {
+                Text("+", fontSize = 24.sp, color = Color.Black)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            SmallFloatingActionButton(
+                onClick = { mapView.controller.zoomOut() },
+                modifier = Modifier.size(40.dp),
+                containerColor = Color.White,
+                shape = CircleShape
+            ) {
+                Text("-", fontSize = 24.sp, color = Color.Black)
+            }
+        }
+    }
 }
 

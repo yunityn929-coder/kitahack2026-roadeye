@@ -75,23 +75,32 @@ fun RoadEyeApp() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Camera Feed (Top Half) when Active
-            if (isRoadEyeStarted) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                ) {
+            // Camera Feed Area (Top 60%)
+            Box(
+                modifier = Modifier
+                    .weight(0.6f)
+                    .fillMaxWidth()
+            ) {
+                if (isRoadEyeStarted) {
                     CameraPreviewView(modifier = Modifier.fillMaxSize())
+                } else {
+                    // Optional dark background to fill space when off
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text("Camera is off")
+                        }
+                    }
                 }
             }
 
-            // Map & Controls (Bottom Half or Full)
+            // Map & Controls Area (Bottom 40%) - Fixed size so it doesn't move
             Box(
                 modifier = Modifier
-                    .weight(if (isRoadEyeStarted) 1f else 1f) // Always takes remaining space
+                    .weight(0.4f)
                     .fillMaxWidth()
-                    .then(if (!isRoadEyeStarted) Modifier.fillMaxHeight() else Modifier)
             ) {
                 OsmMapView(
                     modifier = Modifier.fillMaxSize()
