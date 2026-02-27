@@ -48,6 +48,10 @@ fun OsmMapView(modifier: Modifier = Modifier) {
         Configuration.getInstance().userAgentValue = context.packageName
 
         MapView(context).apply {
+            layoutParams = android.view.ViewGroup.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            )
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER) // Hide default zoom buttons
@@ -61,7 +65,7 @@ fun OsmMapView(modifier: Modifier = Modifier) {
 
             locationOverlay.runOnFirstFix {
                 post {
-                    controller.animateTo(locationOverlay.myLocation)
+                    controller.setCenter(locationOverlay.myLocation)
                     controller.setZoom(20.0)
                 }
             }
