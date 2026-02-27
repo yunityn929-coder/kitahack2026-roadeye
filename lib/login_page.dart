@@ -63,10 +63,8 @@ class _LoginPageState extends State<LoginPage>
       backgroundColor: const Color(0xFF080809),
       body: Stack(
         children: [
-          // ── Animated background grid ──────────────────────────
           Positioned.fill(child: _GridBackground(pulse: _pulseAnim)),
 
-          // ── Radial glow top-left ──────────────────────────────
           Positioned(
             top: -180,
             left: -180,
@@ -88,7 +86,6 @@ class _LoginPageState extends State<LoginPage>
             ),
           ),
 
-          // ── Bottom-right accent glow ──────────────────────────
           Positioned(
             bottom: -200,
             right: -200,
@@ -110,7 +107,6 @@ class _LoginPageState extends State<LoginPage>
             ),
           ),
 
-          // ── Main content ──────────────────────────────────────
           Center(
             child: AnimatedBuilder(
               animation: _fadeCtrl,
@@ -126,11 +122,9 @@ class _LoginPageState extends State<LoginPage>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // ── Logo block ──────────────────────────
                     _LogoBlock(),
                     const SizedBox(height: 40),
 
-                    // ── Card ────────────────────────────────
                     _GlassCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,7 +184,6 @@ class _LoginPageState extends State<LoginPage>
                           ),
                           const SizedBox(height: 28),
 
-                          // Email field
                           _FieldLabel('EMAIL ADDRESS'),
                           const SizedBox(height: 6),
                           _StyledField(
@@ -201,7 +194,6 @@ class _LoginPageState extends State<LoginPage>
                           ),
                           const SizedBox(height: 18),
 
-                          // Password field
                           _FieldLabel('PASSWORD'),
                           const SizedBox(height: 6),
                           _StyledField(
@@ -223,14 +215,12 @@ class _LoginPageState extends State<LoginPage>
                           ),
                           const SizedBox(height: 8),
 
-                          // Error
                           if (_errorMessage.isNotEmpty) ...[
                             const SizedBox(height: 10),
                             _ErrorBanner(message: _errorMessage),
                           ],
                           const SizedBox(height: 24),
 
-                          // Login button
                           _isLoading
                               ? const Center(
                                   child: SizedBox(
@@ -249,7 +239,6 @@ class _LoginPageState extends State<LoginPage>
                                 ),
                           const SizedBox(height: 20),
 
-                          // Divider + sign up
                           Row(
                             children: [
                               Expanded(
@@ -325,15 +314,6 @@ class _LoginPageState extends State<LoginPage>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Signup Page
-// ─────────────────────────────────────────────────────────────────────────────
-// NOTE: Keep this in the same file or split into signup_page.dart as needed.
-
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  Shared widgets
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _LogoBlock extends StatelessWidget {
   @override
@@ -634,7 +614,6 @@ class _SecondaryButtonState extends State<_SecondaryButton> {
   }
 }
 
-// ── Animated grid background ─────────────────────────────────────────────────
 class _GridBackground extends StatelessWidget {
   final Animation<double> pulse;
   const _GridBackground({required this.pulse});

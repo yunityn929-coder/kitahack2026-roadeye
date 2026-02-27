@@ -11,7 +11,6 @@ class HistoryPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
             decoration: const BoxDecoration(
@@ -58,7 +57,6 @@ class HistoryPage extends StatelessWidget {
             ),
           ),
 
-          // ── List ────────────────────────────────────────────────
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -236,7 +234,6 @@ class _RepairedCardState extends State<_RepairedCard>
             ),
             child: Row(
               children: [
-                // ── Thumbnail ────────────────────────────────
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(11),
@@ -253,7 +250,6 @@ class _RepairedCardState extends State<_RepairedCard>
                               errorBuilder: (_, __, ___) => _NoImage(),
                             )
                           : _NoImage(),
-                      // Green overlay tint to indicate resolved
                       Container(
                         width: 90,
                         height: 90,
@@ -278,7 +274,6 @@ class _RepairedCardState extends State<_RepairedCard>
                   ),
                 ),
 
-                // ── Content ──────────────────────────────────
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -286,7 +281,6 @@ class _RepairedCardState extends State<_RepairedCard>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Label + RESOLVED badge
                         Row(
                           children: [
                             Expanded(
@@ -326,7 +320,6 @@ class _RepairedCardState extends State<_RepairedCard>
 
                         const SizedBox(height: 8),
 
-                        // Original severity bar (dimmed)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -363,7 +356,6 @@ class _RepairedCardState extends State<_RepairedCard>
 
                         const SizedBox(height: 10),
 
-                        // Coordinates
                         Row(
                           children: [
                             const Icon(Icons.location_on_outlined,

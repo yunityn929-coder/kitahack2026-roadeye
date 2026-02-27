@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:roadeye_dashboard/dashboard_page.dart';
 import 'package:roadeye_dashboard/login_page.dart';
 import 'package:roadeye_dashboard/signup_page.dart';
-// import 'dart:js' as js;
 import 'dart:ui_web' as ui;
 import 'package:web/web.dart' as web;
 

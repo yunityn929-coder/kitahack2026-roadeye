@@ -12,7 +12,6 @@ class PotholeListPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
             decoration: const BoxDecoration(
@@ -84,7 +83,6 @@ class PotholeListPage extends StatelessWidget {
             ),
           ),
 
-          // ── List ────────────────────────────────────────────────
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -227,7 +225,6 @@ class _PulseDotState extends State<_PulseDot>
   }
 }
 
-// ── Individual pothole card ──────────────────────────────────────
 class _PotholeCard extends StatefulWidget {
   final int index;
   final String docId;
@@ -352,7 +349,6 @@ class _PotholeCardState extends State<_PotholeCard>
             ),
             child: Row(
               children: [
-                // ── Thumbnail ────────────────────────────────
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(11),
@@ -370,7 +366,6 @@ class _PotholeCardState extends State<_PotholeCard>
                       : _NoImage(size: 90),
                 ),
 
-                // ── Content ──────────────────────────────────
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -378,7 +373,6 @@ class _PotholeCardState extends State<_PotholeCard>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Label + severity badge
                         Row(
                           children: [
                             Expanded(
@@ -419,7 +413,6 @@ class _PotholeCardState extends State<_PotholeCard>
 
                         const SizedBox(height: 8),
 
-                        // Confidence bar
                         Row(
                           mainAxisAlignment:
                               MainAxisAlignment.spaceBetween,
@@ -457,7 +450,6 @@ class _PotholeCardState extends State<_PotholeCard>
 
                         const SizedBox(height: 10),
 
-                        // Coordinates
                         Row(
                           children: [
                             const Icon(Icons.location_on_outlined,
@@ -478,7 +470,6 @@ class _PotholeCardState extends State<_PotholeCard>
                   ),
                 ),
 
-                // ── Severity accent bar (right edge) ──────────
                 Container(
                   width: 3,
                   height: 90,
@@ -499,7 +490,6 @@ class _PotholeCardState extends State<_PotholeCard>
   }
 }
 
-// ── No-image placeholder ─────────────────────────────────────────
 class _NoImage extends StatelessWidget {
   final double size;
   const _NoImage({required this.size});

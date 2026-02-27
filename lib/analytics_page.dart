@@ -51,7 +51,7 @@ class AnalyticsPage extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header ──────────────────────────────────────────
+              // Header
               Container(
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
                 decoration: const BoxDecoration(
@@ -98,14 +98,14 @@ class AnalyticsPage extends StatelessWidget {
                 ),
               ),
 
-              // ── Body ────────────────────────────────────────────
+              // Body
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── KPI Cards ────────────────────────────
+                      // KPI Cards
                       Row(
                         children: [
                           _KpiCard(
@@ -140,7 +140,7 @@ class AnalyticsPage extends StatelessWidget {
 
                       const SizedBox(height: 28),
 
-                      // ── Charts Row ───────────────────────────
+                      // Charts Row 
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -254,7 +254,7 @@ class AnalyticsPage extends StatelessWidget {
 
                       const SizedBox(height: 28),
 
-                      // ── Summary Table ───────────────────────
+                      //  Summary Table
                       _ChartCard(
                         title: 'SEVERITY × STATUS MATRIX',
                         child: Padding(
@@ -276,7 +276,7 @@ class AnalyticsPage extends StatelessWidget {
   }
 }
 
-// ── KPI Card ─────────────────────────────────────────────────────────────────
+// KPI Card
 class _KpiCard extends StatelessWidget {
   final String label, value;
   final IconData icon;
@@ -340,7 +340,7 @@ class _KpiCard extends StatelessWidget {
   }
 }
 
-// ── Chart Card Wrapper ───────────────────────────────────────────────────────
+// Chart Card Wrapper
 class _ChartCard extends StatelessWidget {
   final String title;
   final Widget child;
@@ -377,7 +377,6 @@ class _ChartCard extends StatelessWidget {
   }
 }
 
-// ── Donut Chart (pure Flutter) ───────────────────────────────────────────────
 class _DonutChart extends StatelessWidget {
   final int resolved, pending, total;
 
@@ -430,10 +429,9 @@ class _DonutPainter extends CustomPainter {
     final rect = Rect.fromLTWH(
         strokeW / 2, strokeW / 2, size.width - strokeW, size.height - strokeW);
 
-    // Background track
     canvas.drawArc(
       rect,
-      -1.5708, // -90 deg
+      -1.5708, 
       6.2832,
       false,
       Paint()
@@ -478,7 +476,7 @@ class _DonutPainter extends CustomPainter {
       old.resolvedFrac != resolvedFrac;
 }
 
-// ── Legend dot ───────────────────────────────────────────────────────────────
+// Legend dot
 class _Legend extends StatelessWidget {
   final Color color;
   final String label;
@@ -505,7 +503,7 @@ class _Legend extends StatelessWidget {
   }
 }
 
-// ── Severity Bar ─────────────────────────────────────────────────────────────
+// Severity Bar
 class _SeverityBar extends StatelessWidget {
   final String label, icon;
   final int count, total;
@@ -563,7 +561,7 @@ class _SeverityBar extends StatelessWidget {
   }
 }
 
-// ── Circular progress ────────────────────────────────────────────────────────
+// Circular progress
 class _CircularProgress extends StatelessWidget {
   final double value;
   final Color color;
@@ -649,7 +647,7 @@ class _CirclePainter extends CustomPainter {
   bool shouldRepaint(_CirclePainter old) => old.value != value;
 }
 
-// ── Stat Pill ────────────────────────────────────────────────────────────────
+// Stat Pill
 class _StatPill extends StatelessWidget {
   final String label, value;
   final Color color;
@@ -675,7 +673,7 @@ class _StatPill extends StatelessWidget {
   }
 }
 
-// ── Matrix Table ─────────────────────────────────────────────────────────────
+// Matrix Table
 class _MatrixTable extends StatelessWidget {
   final List<QueryDocumentSnapshot> docs;
 

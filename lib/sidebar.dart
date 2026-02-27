@@ -109,7 +109,6 @@ class SimpleSidebar extends StatelessWidget {
     return value;
   }
 
-  // ── Profile / Reset Password dialog ──────────────────────────────────────
   void _showProfileDialog(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final email = user?.email ?? 'Unknown';
@@ -150,7 +149,6 @@ class SimpleSidebar extends StatelessWidget {
             onTap: () => onItemSelected(0),
           ),
 
-          // ── Analytics button ──────────────────────────────────
           _SidebarButton(
             icon: Icons.bar_chart_rounded,
             label: 'Analytics',
@@ -158,7 +156,6 @@ class SimpleSidebar extends StatelessWidget {
             onTap: () => onItemSelected(3),
           ),
 
-          // ── Potholes expandable ───────────────────────────────
           Theme(
             data: Theme.of(context)
                 .copyWith(dividerColor: Colors.transparent),
@@ -188,7 +185,6 @@ class SimpleSidebar extends StatelessWidget {
 
           const Spacer(),
 
-          // ── Download Report ───────────────────────────────────
           _SidebarButton(
             icon: Icons.download,
             label: 'Download Report',
@@ -198,7 +194,6 @@ class SimpleSidebar extends StatelessWidget {
 
           const Divider(color: Color(0xFF2a2a2e), height: 1),
 
-          // ── Profile row ───────────────────────────────────────
           InkWell(
             onTap: () => _showProfileDialog(context),
             child: Container(
@@ -206,7 +201,6 @@ class SimpleSidebar extends StatelessWidget {
                   const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
               child: Row(
                 children: [
-                  // Avatar circle
                   CircleAvatar(
                     radius: 16,
                     backgroundColor: Colors.blueAccent.withOpacity(0.2),
@@ -235,7 +229,6 @@ class SimpleSidebar extends StatelessWidget {
             ),
           ),
 
-          // ── Logout ────────────────────────────────────────────
           Padding(
             padding:
                 const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 4),
@@ -262,7 +255,6 @@ class SimpleSidebar extends StatelessWidget {
   }
 }
 
-// ── Profile Dialog ────────────────────────────────────────────────────────────
 class _ProfileDialog extends StatefulWidget {
   final String email;
   final String displayName;
@@ -315,7 +307,6 @@ class _ProfileDialogState extends State<_ProfileDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Avatar
               CircleAvatar(
                 radius: 36,
                 backgroundColor: Colors.blueAccent.withOpacity(0.2),
@@ -330,7 +321,6 @@ class _ProfileDialogState extends State<_ProfileDialog> {
               ),
               const SizedBox(height: 16),
 
-              // Email
               Text(
                 widget.email,
                 style: const TextStyle(
@@ -364,7 +354,6 @@ class _ProfileDialogState extends State<_ProfileDialog> {
               const Divider(color: Color(0xFF2a2a2e)),
               const SizedBox(height: 16),
 
-              // Reset password section
               Row(
                 children: const [
                   Icon(Icons.lock_reset_rounded,
@@ -470,7 +459,6 @@ class _ProfileDialogState extends State<_ProfileDialog> {
   }
 }
 
-// ── Sidebar Button ────────────────────────────────────────────────────────────
 class _SidebarButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -516,7 +504,6 @@ class _SidebarButton extends StatelessWidget {
   }
 }
 
-// ── Sidebar Sub Button ────────────────────────────────────────────────────────
 class _SidebarSubButton extends StatelessWidget {
   final String label;
   final bool isSelected;

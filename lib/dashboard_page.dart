@@ -17,13 +17,11 @@ class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
   final Set<String> _drawnMarkerIds = {};
 
-  // Filter state — all on by default
   bool _showHigh     = true;
   bool _showMedium   = true;
   bool _showLow      = true;
   bool _showResolved = true;
 
-  // Live counts for the badge on each toggle
   int _countHigh = 0, _countMedium = 0, _countLow = 0, _countResolved = 0;
 
   @override
@@ -32,7 +30,6 @@ class _DashboardPageState extends State<DashboardPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _initGoogleMap());
   }
 
-  // ── Propagate Flutter filter state → JS ────────────────────────────────
   void _applyFilters() {
     final high     = _showHigh     ? 'true' : 'false';
     final medium   = _showMedium   ? 'true' : 'false';
@@ -72,7 +69,6 @@ class _DashboardPageState extends State<DashboardPage> {
     _applyFilters();
   }
 
-  // ── Map init ────────────────────────────────────────────────────────────
   void _initGoogleMap() {
     js.context['dartResolveMarker'] = js.allowInterop((String markerId) {
       FirebaseFirestore.instance
@@ -118,7 +114,6 @@ class _DashboardPageState extends State<DashboardPage> {
     _listenToRawHazards();
   }
 
-  // ── Firestore listener ──────────────────────────────────────────────────
   void _listenToRawHazards() {
     FirebaseFirestore.instance
         .collection('hazards_raw')
@@ -162,12 +157,10 @@ class _DashboardPageState extends State<DashboardPage> {
         });
       }
 
-      // Re-apply visibility after new markers drop in
       Future.delayed(const Duration(milliseconds: 400), _applyFilters);
     });
   }
 
-  // ── Add marker to JS ────────────────────────────────────────────────────
   void _addMarkerToJs(String id, double lat, double lng, String img,
       String label, String sev, String status) {
     String accentColor = '#f59e0b';
@@ -265,7 +258,6 @@ class _DashboardPageState extends State<DashboardPage> {
     """]);
   }
 
-  // ── Build ───────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -316,7 +308,6 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-// ── Filter Bar ─────────────────────────────────────────────────────────────────
 class _FilterBar extends StatelessWidget {
   final bool showHigh, showMedium, showLow, showResolved;
   final int  countHigh, countMedium, countLow, countResolved;
@@ -396,7 +387,6 @@ class _FilterBar extends StatelessWidget {
   }
 }
 
-// ── Individual filter chip ─────────────────────────────────────────────────────
 class _FilterChip extends StatefulWidget {
   final String label, icon;
   final int count;
@@ -449,7 +439,6 @@ class _FilterChipState extends State<_FilterChip> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Active indicator dot
               AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
                 width: 6,
@@ -471,7 +460,6 @@ class _FilterChipState extends State<_FilterChip> {
                   letterSpacing: 0.6,
                 ),
               ),
-              // Count badge
               if (widget.count > 0) ...[
                 const SizedBox(width: 6),
                 Container(
@@ -495,7 +483,6 @@ class _FilterChipState extends State<_FilterChip> {
                   ),
                 ),
               ],
-              // Hidden eye icon when inactive
               if (!widget.active) ...[
                 const SizedBox(width: 5),
                 const Icon(Icons.visibility_off_outlined,

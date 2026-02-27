@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Re-uses shared widgets defined in login_page.dart.
-// Make sure login_page.dart is imported or widgets are in a shared file.
-// For convenience all shared widgets are duplicated here so the file is self-contained.
-
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
   @override
@@ -69,7 +65,6 @@ class _SignupPageState extends State<SignupPage>
       backgroundColor: const Color(0xFF080809),
       body: Stack(
         children: [
-          // ── Background grid ──────────────────────────────────
           Positioned.fill(
             child: AnimatedBuilder(
               animation: _pulseAnim,
@@ -79,7 +74,6 @@ class _SignupPageState extends State<SignupPage>
             ),
           ),
 
-          // ── Top-right glow (blue for signup) ─────────────────
           Positioned(
             top: -180,
             right: -180,
@@ -102,7 +96,6 @@ class _SignupPageState extends State<SignupPage>
             ),
           ),
 
-          // ── Bottom-left glow ─────────────────────────────────
           Positioned(
             bottom: -200,
             left: -200,
@@ -125,7 +118,6 @@ class _SignupPageState extends State<SignupPage>
             ),
           ),
 
-          // ── Main content ─────────────────────────────────────
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 32),
@@ -143,11 +135,9 @@ class _SignupPageState extends State<SignupPage>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Logo
                       _LogoBlock(),
                       const SizedBox(height: 40),
 
-                      // Card
                       Container(
                         padding: const EdgeInsets.all(28),
                         decoration: BoxDecoration(
@@ -166,7 +156,6 @@ class _SignupPageState extends State<SignupPage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Header
                             Row(
                               children: [
                                 Container(
@@ -221,7 +210,6 @@ class _SignupPageState extends State<SignupPage>
                             ),
                             const SizedBox(height: 28),
 
-                            // Username
                             _FieldLabel('USERNAME'),
                             const SizedBox(height: 6),
                             _StyledField(
@@ -233,7 +221,6 @@ class _SignupPageState extends State<SignupPage>
                             ),
                             const SizedBox(height: 18),
 
-                            // Email
                             _FieldLabel('EMAIL ADDRESS'),
                             const SizedBox(height: 6),
                             _StyledField(
@@ -245,7 +232,6 @@ class _SignupPageState extends State<SignupPage>
                             ),
                             const SizedBox(height: 18),
 
-                            // Password
                             _FieldLabel('PASSWORD'),
                             const SizedBox(height: 6),
                             _StyledField(
@@ -268,7 +254,6 @@ class _SignupPageState extends State<SignupPage>
                             ),
                             const SizedBox(height: 18),
 
-                            // Confirm password
                             _FieldLabel('CONFIRM PASSWORD'),
                             const SizedBox(height: 6),
                             _StyledField(
@@ -290,14 +275,12 @@ class _SignupPageState extends State<SignupPage>
                               ),
                             ),
 
-                            // Error
                             if (_errorMessage.isNotEmpty) ...[
                               const SizedBox(height: 16),
                               _ErrorBanner(message: _errorMessage),
                             ],
                             const SizedBox(height: 24),
 
-                            // Submit button
                             _isLoading
                                 ? const Center(
                                     child: SizedBox(
@@ -316,7 +299,6 @@ class _SignupPageState extends State<SignupPage>
                                   ),
                             const SizedBox(height: 20),
 
-                            // Back to login
                             Row(
                               children: [
                                 Expanded(
@@ -405,9 +387,6 @@ class _SignupPageState extends State<SignupPage>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Shared Widgets
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _LogoBlock extends StatelessWidget {
   @override
@@ -553,7 +532,6 @@ class _ErrorBanner extends StatelessWidget {
       );
 }
 
-// Blue primary button for signup
 class _BlueButton extends StatefulWidget {
   final String label;
   final IconData icon;
@@ -618,7 +596,6 @@ class _BlueButtonState extends State<_BlueButton> {
   }
 }
 
-// Ghost button for "back"
 class _GhostButton extends StatefulWidget {
   final String label;
   final VoidCallback onPressed;
@@ -671,7 +648,6 @@ class _GhostButtonState extends State<_GhostButton> {
   }
 }
 
-// Grid background painter
 class _GridPainter extends CustomPainter {
   final double opacity;
   _GridPainter({required this.opacity});
